@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - AMADEUS_API_KEY=SP6AMdqjC3FRX0WQpML1VuUDxGCABmGG
+      - AMADEUS_API_SECRET=cglRm0LsOSxtZvDG
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
