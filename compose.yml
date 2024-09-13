@@ -1,12 +1,13 @@
 version: '3'
 services:
   app:
+    env_file: .env
     build: .
     ports:
       - "5000:5000"
     environment:
-      - AMADEUS_API_KEY=SP6AMdqjC3FRX0WQpML1VuUDxGCABmGG
-      - AMADEUS_API_SECRET=cglRm0LsOSxtZvDG
+      - AMADEUS_API_KEY=${AMADEUS_API_KEY}
+      - AMADEUS_API_SECRET=${AMADEUS_API_SECRET}
     depends_on:
       - redis
   redis:
