@@ -34,7 +34,6 @@ Sample endpoint - [http://127.0.0.1:5000/flights/price?origin=JFK&destination=LA
 
 Sample response 
     
-    ```
     {
       "data": {
         "departure_date": "2024-10-04", 
@@ -44,7 +43,6 @@ Sample response
       }
     }
 
-    ```
     
   #### [Flight Price with cache](http://127.0.0.1:5000/flights/price?origin=ORIGIN_CODE&destination=DESTINATION_CODE&date=DATE&nocache=1)
   
