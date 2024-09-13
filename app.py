@@ -4,7 +4,8 @@ from flask_cors import CORS,cross_origin
 from bson.objectid import ObjectId
 import random
 import requests
-from setup import *
+from setup import AMADEUS_API_KEY, AMADEUS_API_SECRET
+from functions import getFlightsData, getCheapestFlight
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -13,56 +14,28 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 def healthcheck():
     return "<p>Backend is running..</p>"
 
-def getCheapestFlight(data):
-    price = float(data['data'][0]['price']['total'])
-    cheapest = data['data'][0]
-    for i in data['data']:
-        if float(i['price']['total']) < price:
-            price = float(i['price']['total'])
-            cheapest = i
-    return cheapest
-
-
-def getFlightsData():
-    url = "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=JFK&destinationLocationCode=LAX&departureDate=2024-12-01&adults=1"
-    try:
-        token = getAccessToken()['access_token']
-        header = {
-            "Authorization": "Bearer " + token
-        }
-        response = requests.get(url,headers=header)
-        
-        if response.status_code == 200:
-            posts = response.json()
-            return posts
-        else:
-            print('Error:', response.status_code)
-            return None
-    except Exception as e:
-        print('Error:', e)
-        return None
-
-def getAccessToken():
-    url = "https://test.api.amadeus.com/v1/security/oauth2/token"
-    headers = {
-           "Content-Type": "application/x-www-form-urlencoded"
-        }
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": AMADEUS_API_KEY, 
-        "client_secret": AMADEUS_API_SECRET  
-    }
-
-    response = requests.post(url,headers=headers,data=data)
-    return response.json()
-        
-
+@app.route("/flights/ping")
+def pingFlight():
+    return {"data":"pong"}
 @app.route("/flights/price")
 def getFlights():
-    data = getFlightsData()
+    args= request.args
+    origin = args.get('origin')
+    destination = args.get('destination')
+    date = args.get('date')
+    print(origin,destination,date)
+    data = getFlightsData(origin,destination,date)
     if(data):
         cheapest = getCheapestFlight(data)
-        return cheapest
+        price =int(float(cheapest['price']['total']))
+        return {
+        "data": {
+        "origin": origin,
+        "destination": destination,
+        "departure_date": date,
+        "price": f"{price} USD"
+        }
+        }
         # return data
     return "No data"
     
